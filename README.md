@@ -21,7 +21,7 @@ LLM: HTML/CSS generation, limited JS codegen (start manually, use when stuck, es
 
 **Developers:**
 - Zeyan Lin (zl537@drexel.edu)
-- Mable Guo (mg3798@drexel.edu)-
+- Mable Guo (mg3798@drexel.edu)
 - Elena Suarez (es3477@drexel.edu)
 - Keyra DeSouza (kad474@drexel.edu)
 - Adriana Drones (ald462@drexel.edu)
