@@ -1,15 +1,14 @@
-Create DATABASE blind_collection;
-\c blind_collection
-Create table accounts (
-    username varchar(25),
-    email varchar(25),
-    password varchar(25)
+CREATE TABLE IF NOT EXISTS accounts (
+    id serial PRIMARY KEY,
+    username varchar(25) NOT NULL UNIQUE,
+    email varchar(255) NOT NULL UNIQUE,
+    password varchar(255) NOT NULL
 );
-Create table items (
-    id serial primary key,
+CREATE TABLE IF NOT EXISTS items (
+    id serial PRIMARY KEY,
     name varchar(25),
     brand varchar(25),
     series varchar(25),
     quality varchar(25),
-    upForTrade boolean
+    up_for_trade boolean DEFAULT false
 );
