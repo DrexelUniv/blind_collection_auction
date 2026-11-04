@@ -8,5 +8,7 @@ Create table accounts (
 Create table items (
     id serial primary key,
     name varchar(25),
-    quality varchar(25)
+    series varchar(25),
+    quality varchar(25),
+    upForTrade boolean
 );
