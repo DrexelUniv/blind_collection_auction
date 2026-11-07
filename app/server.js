@@ -66,6 +66,57 @@ app.post("/signup", (req, res) => {
     });
 });
 
+// login
+app.post("/login", async (req, res) => {
+    let body = req.body;
+
+    if (body.username.trim().length < 1 ) {
+        return res.status(400).json({message: "Username field cannot be left empty"});
+    } else if (body.username.length > 25) {
+        return res.status(400).json({message: "Please enter valid username"});
+    }
+
+    if (body.password.length < 1 ) {
+        return res.status(400).json({message: "Password field cannot be left empty"});
+    }
+
+    let username = body.username.trim();
+    let password = body.password;
+
+    console.log(username, password);
+
+    try {
+        const userQuery = await pool.query(
+            `SELECT * FROM accounts WHERE username = $1`,
+            [username]
+        );
+
+        // validate existence of username
+        if (userQuery.rows.length === 0) {
+            return res.status(401).json({ message: "Invalid username or password" });
+        }
+
+        const user = userQuery.rows[0];
+
+        // validate entered password against stored password
+        if (password !== user.password) {
+            return res.status(401).json({ message: "Invalid username or password" });
+        }
+
+        // successful login
+        return res.status(200).json({ 
+            message: "Login succesful!",
+            userId: user.id,
+            username: user.username
+        });
+        
+    } catch (error) {
+        console.log("Login error: ", error);
+
+        return res.status(500).json({ message: "error occured during login process" });
+    }
+        
+});
 
 app.listen(port, hostname, () => {
     console.log(`Listening at: http://${hostname}:${port}`);
