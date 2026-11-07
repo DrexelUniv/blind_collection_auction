@@ -66,6 +66,48 @@ app.post("/signup", (req, res) => {
     });
 });
 
+app.post("/login", async (req,res) =>{
+    const {username, password} = req.body || {};
+
+    if (typeof username !== "string" || (username.length < 1 || username.length > 25)) {
+        return res.status(400).json({message: "Please enter valid username"});
+    }
+
+    if (typeof password !== "string" || (password.length < 1)) {
+        return res.status(400).json({message: "Please enter password"});
+    }
+
+    try{
+        const result = await pool.query(
+        'SELECT * FROM accounts WHERE username = $1',
+        [username]
+    )
+
+        if (result.rows.length === 0){
+            return res.status(401).json({
+                message: "Invalid username or password"
+            });
+        }
+
+        const account = result.rows[0];
+
+        if(account.password !== password){
+            return res.status(401).json({
+                message: "Invalid username or password"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Login successful"
+        });
+        
+    } catch(error){
+        console.error("Login database error:", error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+});
 
 app.listen(port, hostname, () => {
     console.log(`Listening at: http://${hostname}:${port}`);
