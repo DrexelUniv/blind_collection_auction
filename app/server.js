@@ -21,6 +21,37 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // signup
+
+// reset password
+app.post("/reset-password", (req, res) => {
+    let body = req.body;
+ 
+    if (!body.email || body.email.length < 1) {
+        return res.status(400).json({ message: "Please enter valid email" });
+    }
+ 
+    if (!body.password || body.password.length < 1) {
+        return res.status(400).json({ message: "Please enter a new password" });
+    }
+ 
+    if (body.password !== body.confirm_pass) {
+        return res.status(400).json({ message: "Passwords must match" });
+    }
+ 
+    pool.query(
+        `Update accounts set password = $1 where email = $2`,
+        [body.password, body.email]
+    ).then((result) => {
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "No account found with that email" });
+        }
+        res.status(200).json({ message: "Password updated!" });
+    }).catch((error) => {
+        console.log(error);
+        res.status(500).json({ message: "Could not reset password" });
+    });
+});
+
 app.post("/signup", (req, res) => {
     let body = req.body;
 

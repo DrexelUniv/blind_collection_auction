@@ -1,50 +1,36 @@
+let button = document.getElementById("submit");
+let message = document.getElementById("message");
+let username = document.getElementById("username");
+let password = document.getElementById("password");
 
-const loginForm = document.getElementById("loginForm");
-const errorMessage = document.getElementById("errorMessage");
+button.addEventListener("click", () => {
+    message.textContent = "";  //clear message
 
-loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    console.log(username.value, password.value);
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    fetch(`/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username: username.value,
+            password: password.value
+        })
 
-    errorMessage.textContent = "";
-    
-    if (username.trim() === "") {
-        errorMessage.textContent = "Please enter username";
-        return;
-    }
+    }).then((response) => {
+        return response.json().then(data => ({
+            status: response.status,
+            data: data
+        }));
+    }).then(result => {
+        message.textContent = result.data.message;
 
-    if (password === "") {
-        errorMessage.textContent = "Please enter password";
-        return;
-    }
-
-    try {
-        const response = await fetch("/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            errorMessage.textContent = data.message;
-            return;
+        if (result.status === 200) {
+            window.location.href = "/index.html";   
         }
-
-        alert("Login successful!");
-
-        // Redirect can be added once the homepage is made
-
-    } catch (error) {
-        errorMessage.textContent =
-            "Unable to connect to server";
-    }
+    }).catch(error => {
+        console.log(error);
+        message.textContent = "Something went wrong.";
+    });
 });

@@ -1,0 +1,61 @@
+#profile-header {
+    display: flex;
+    align-items: center;
+    gap: 28px; 
+    padding: 32px; 
+}
+
+.pfp-image{
+    width: 90px;
+    height: 90px; 
+
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: lightgray;
+
+}
+
+#user-name{
+    font-size: 20px; 
+    margin-bottom: 2px;
+}
+
+#email{
+   font-size: 16px;
+   margin-bottom: 4px; 
+}
+
+#bio{
+    font-size: 10px;
+}
+
+#profile-navigation h2 {
+  font-size:20px; 
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+  margin-left:4px; 
+}
+
+#profile-navigation ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#profile-navigation li a {
+  display: block;
+  padding: 14px 18px;
+  text-decoration: none;
+  border: 1px solid gainsboro;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+#profile-navigation li a:hover {
+  border-color: lightgray;
+  color: #0f172a;
+  transform: translateX(4px);
+}
