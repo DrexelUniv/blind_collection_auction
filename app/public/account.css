@@ -15,12 +15,12 @@
 
 }
 
-#display-name{
+#user-name{
     font-size: 20px; 
     margin-bottom: 2px;
 }
 
-#username{
+#email{
    font-size: 16px;
    margin-bottom: 4px; 
 }
