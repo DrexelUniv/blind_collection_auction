@@ -1,6 +1,7 @@
 const pg = require("pg");
 const express = require("express");
 const app = express();
+const { hashPassword, validatePassword } = require("./passwordUtil");
 
 const port = 3000;
 const hostname = "localhost";
@@ -8,6 +9,7 @@ const hostname = "localhost";
 const env = require("../env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
+
 pool.connect()
     .then(function (client) {
         console.log(`Connected to database ${env.database}`);
@@ -21,65 +23,39 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // signup
-
-// reset password
-app.post("/reset-password", (req, res) => {
-    let body = req.body;
- 
-    if (!body.email || body.email.length < 1) {
-        return res.status(400).json({ message: "Please enter valid email" });
-    }
- 
-    if (!body.password || body.password.length < 1) {
-        return res.status(400).json({ message: "Please enter a new password" });
-    }
- 
-    if (body.password !== body.confirm_pass) {
-        return res.status(400).json({ message: "Passwords must match" });
-    }
- 
-    pool.query(
-        `Update accounts set password = $1 where email = $2`,
-        [body.password, body.email]
-    ).then((result) => {
-        if (result.rowCount === 0) {
-            return res.status(404).json({ message: "No account found with that email" });
-        }
-        res.status(200).json({ message: "Password updated!" });
-    }).catch((error) => {
-        console.log(error);
-        res.status(500).json({ message: "Could not reset password" });
-    });
-});
-
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
     let body = req.body;
 
     if ((body.username.length < 1 || body.username.length > 25)) {
-        return res.status(400).json({message: "Please enter valid username"});
+        return res.status(400).json({ message: "Please enter valid username" });
     }
 
     if ((body.email.length < 1)) {
-        return res.status(400).json({message: "Please enter valid email"});
+        return res.status(400).json({ message: "Please enter valid email" });
     }
 
-    if (!(body.password === body.confirm_pass)) {
-        return res.status(400).json({message: "Password must match"});
+    if ((body.password.length < 1 || body.confirm_pass < 1)) {
+        return res.status(400).json({ message: "Password fields cannot be left empty" });
+    } else if (!(body.password === body.confirm_pass)) {
+        return res.status(400).json({ message: "Password must match" });
     }
 
     let username = body.username;
     let email = body.email;
     let password = body.password;
 
-    console.log(username, email, password);
+    try {
+        const hashedPassword = await hashPassword(password);
 
-    pool.query(
-        `Insert into accounts (username, email, password)
-         values ($1, $2, $3)`,
-        [username, email, password]
-    ).then(() => {
+        await pool.query(
+            `Insert into accounts (username, email, password)
+            values ($1, $2, $3)`,
+            [username, email, hashedPassword]
+        );
+
         res.status(200).json({ message: "Account Created!" });
-    }).catch((error) => {
+        
+    } catch (error) {
         console.log(error);
 
         // PostgreSQL error code 23505 represents a unique_violation
@@ -94,9 +70,10 @@ app.post("/signup", (req, res) => {
         }
 
         res.status(500).json({ message: "Could not create account" });
-    });
+    };
 });
 
+// login
 app.post("/login", async (req,res) =>{
     const {username, password} = req.body || {};
 
@@ -108,11 +85,11 @@ app.post("/login", async (req,res) =>{
         return res.status(400).json({message: "Please enter password"});
     }
 
-    try{
+    try {
         const result = await pool.query(
         'SELECT * FROM accounts WHERE username = $1',
         [username]
-    )
+        );
 
         if (result.rows.length === 0){
             return res.status(401).json({
@@ -121,23 +98,66 @@ app.post("/login", async (req,res) =>{
         }
 
         const account = result.rows[0];
+        
+        const validPassword = await validatePassword(
+            password,
+            account.password
+        )
 
-        if(account.password !== password){
+        console.log(validPassword);
+
+        if(!validPassword){
             return res.status(401).json({
                 message: "Invalid username or password"
             });
         }
 
         return res.status(200).json({
-            message: "Login successful"
+            message: "Login successful",
         });
         
-    } catch(error){
+    } catch (error) {
         console.error("Login database error:", error);
         return res.status(500).json({
             message: "Something went wrong"
         });
     }
+});
+
+// reset password
+app.post("/reset-password", async (req, res) => {
+    let body = req.body;
+ 
+    if (!body.email || body.email.length < 1) {
+        return res.status(400).json({ message: "Please enter valid email" });
+    }
+ 
+    if (!body.password || body.password.length < 1) {
+        return res.status(400).json({ message: "Please enter a new password" });
+    }
+ 
+    if (body.password !== body.confirm_pass) {
+        return res.status(400).json({ message: "Passwords must match" });
+    }
+ 
+    console.log("plain: ", body.password, "hashed: ", hashedPassword);
+    try {
+        const hashedPassword = await hashPassword(body.password);
+
+        pool.query(
+            `Update accounts set password = $1 where email = $2`,
+            [hashedPassword, body.email]
+        )
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "No account found with that email" });
+        }
+        
+        return res.status(200).json({ message: "Password updated!" });
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({ message: "Could not reset password" });
+    };
 });
 
 app.listen(port, hostname, () => {

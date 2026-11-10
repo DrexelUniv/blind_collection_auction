@@ -23,11 +23,19 @@ button.addEventListener("click", () => {
         })
 
     }).then((response) => {
-        return response.json();
-    }).then(data => {
-        message.textContent = data.message;
-    }).catch(error => {
+        return response.json().then(data => ({
+            status: response.status,
+            data: data
+        }));
+    }).then((result) => {
+        message.textContent = result.data.message;
+
+        if (result.status >= 200 && result.status < 300) {
+            window.location.href = "/index.html";   
+        }
+    }).catch((error) => {
         console.log(error);
+        message.textContent = "Something went wrong.";
     })
 })
 
