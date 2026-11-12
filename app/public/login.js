@@ -23,13 +23,13 @@ button.addEventListener("click", () => {
             status: response.status,
             data: data
         }));
-    }).then(result => {
+    }).then((result) => {
         message.textContent = result.data.message;
 
-        if (result.status === 200) {
+        if (result.status >= 200 && result.status < 300) {
             window.location.href = "/index.html";   
         }
-    }).catch(error => {
+    }).catch((error) => {
         console.log(error);
         message.textContent = "Something went wrong.";
     });
