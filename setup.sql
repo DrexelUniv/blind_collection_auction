@@ -27,13 +27,14 @@ CREATE INDEX IF NOT EXISTS idx_collection_items_account ON collection_items(acco
 CREATE INDEX IF NOT EXISTS idx_collection_items_item    ON collection_items(item_id);
 
 CREATE TABLE IF NOT EXISTS auctions (
-                                        id                 serial PRIMARY KEY,
-                                        collection_item_id integer NOT NULL REFERENCES collection_items(id) ON DELETE CASCADE,
-                                        seller_id          integer NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-                                        starting_price     numeric(12,2) NOT NULL CHECK (starting_price >= 0),
-                                        start_time         timestamptz NOT NULL DEFAULT now(),
-                                        end_time           timestamptz NOT NULL,
-                                        status             varchar(10) NOT NULL DEFAULT 'open'
+                                        id                  serial PRIMARY KEY,
+                                        collection_item_id  integer NOT NULL REFERENCES collection_items(id) ON DELETE CASCADE,
+                                        seller_id           integer NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                                        starting_price      numeric NOT NULL CHECK (starting_price >= 0),
+                                        current_highest_bid numeric NOT NULL DEFAULT 0 CHECK (current_highest_bid >= 0),
+                                        start_time          timestamptz NOT NULL DEFAULT now(),
+                                        end_time            timestamptz NOT NULL,
+                                        status              varchar(10) NOT NULL DEFAULT 'open'
                                             CHECK (status IN ('open', 'sold', 'cancelled', 'expired')),
                                         CHECK (end_time > start_time)
 );
@@ -45,7 +46,7 @@ CREATE TABLE IF NOT EXISTS bids (
                                     id         serial PRIMARY KEY,
                                     auction_id integer NOT NULL REFERENCES auctions(id) ON DELETE CASCADE,
                                     bidder_id  integer NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-                                    amount     numeric(12,2) NOT NULL CHECK (amount > 0),
+                                    amount     numeric NOT NULL CHECK (amount > 0),
                                     created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_auctions_seller ON auctions(seller_id);
