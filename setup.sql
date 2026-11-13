@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS accounts (
                                         username      citext NOT NULL UNIQUE CHECK (char_length(username) <= 25),
                                         email         citext NOT NULL UNIQUE,
                                         password_hash varchar(255) NOT NULL,
+                                        profile_pic_id integer NOT NULL,
                                         created_at    timestamptz NOT NULL DEFAULT now()
 );
 
