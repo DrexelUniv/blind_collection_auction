@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS accounts (
                                         id            serial PRIMARY KEY,
-                                        username      varchar(25)  NOT NULL UNIQUE,
-                                        email         varchar(255) NOT NULL UNIQUE,
+                                        username      citext NOT NULL UNIQUE CHECK (char_length(username) <= 25),
+                                        email         citext NOT NULL UNIQUE,
                                         password_hash varchar(255) NOT NULL,
-                                        created_at    timestamptz  NOT NULL DEFAULT now()
+                                        created_at    timestamptz NOT NULL DEFAULT now()
 );
 
 -- Catalog of item types
