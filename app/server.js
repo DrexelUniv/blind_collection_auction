@@ -64,7 +64,7 @@ app.post("/signup", async (req, res) => {
         const hashedPassword = await hashPassword(password);
 
         await pool.query(
-            `Insert into accounts (username, email, password)
+            `Insert into accounts (username, email, password_hash)
             values ($1, $2, $3)`,
             [username, email, hashedPassword]
         );
@@ -117,7 +117,7 @@ app.post("/login", async (req,res) =>{
         
         const validPassword = await validatePassword(
             password,
-            account.password
+            account.password_hash
         )
 
         console.log(validPassword);
@@ -161,7 +161,7 @@ app.post("/reset-password", async (req, res) => {
         const hashedPassword = await hashPassword(body.password);
 
         pool.query(
-            `Update accounts set password = $1 where email = $2`,
+            `Update accounts set password_hash = $1 where email = $2`,
             [hashedPassword, body.email]
         )
 
