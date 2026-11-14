@@ -160,6 +160,25 @@ app.post("/reset-password", async (req, res) => {
     };
 });
 
+
+app.get("/items", async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, brand, series, image, rarity
+             FROM items
+             ORDER BY brand, series, name`
+        );
+
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error("Error fetching items:", error);
+        res.status(500).json({
+            message: "Could not retrieve collectibles"
+        });
+    }
+});
+
+
 app.listen(port, hostname, () => {
     console.log(`Listening at: http://${hostname}:${port}`);
 });
