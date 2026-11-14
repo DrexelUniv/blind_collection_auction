@@ -188,7 +188,7 @@ Object.entries(pages).forEach(([route, { view, title }]) => {
 
 // logout has no session to destroy yet, so just go back to login
 app.post("/logout", (req, res) => {
-    res.redirect("/login.html");
+    res.redirect("/src/login.html");
 });
 
 app.listen(port, hostname, () => {
