@@ -24,16 +24,15 @@
     </nav>
 
     <div class="profile-menu">
-        <!-- Blank for now. To add the picture later, put this inside the button:
-             <% if (user) { %><img src="/images/profile_<%= user.profile_pic_id %>.png" alt=""><% } %> -->
+<!--        Blank for now. To add the picture later, put this inside the button:-->
         <button type="button" id="profile-btn" class="profile-btn"
                 aria-haspopup="true" aria-expanded="false" aria-controls="profile-dropdown"
                 aria-label="Open profile menu"></button>
 
         <ul id="profile-dropdown" class="dropdown" hidden>
-            <li><a href="/profile">View Profile</a></li>
+            <li><a href="/account">View Profile</a></li>
             <li><a href="/listings">My Listings</a></li>
-            <li><a href="/settings">Settings</a></li>
+            <li><a href="../public/src/settings.html">Settings</a></li>
             <li>
                 <form action="/logout" method="POST">
                     <button type="submit">Log Out</button>

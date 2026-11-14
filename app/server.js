@@ -6,6 +6,12 @@ const { hashPassword, validatePassword } = require("./passwordUtil");
 const port = 3000;
 const hostname = "localhost";
 
+const path = require("path");
+const fs = require("fs");
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 const env = require("../env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
@@ -21,6 +27,16 @@ pool.connect()
 
 app.use(express.json());
 app.use(express.static("public"));
+
+const pages = {
+    auctions:      { view: "auctions", title: "Auctions" },
+    trade:         { view: "trade",    title: "Trade" },
+    friends:       { view: "friends",  title: "Friends" },
+    notifications: { view: "notif",    title: "Notifications" },
+    account:       { view: "account",  title: "Profile" },
+    listings:      { view: "listings", title: "My Listings" },
+    settings:      { view: "settings", title: "Settings" }
+};
 
 // signup
 app.post("/signup", async (req, res) => {
@@ -158,6 +174,21 @@ app.post("/reset-password", async (req, res) => {
         console.log(error);
         res.status(500).json({ message: "Could not reset password" });
     };
+});
+
+Object.entries(pages).forEach(([route, { view, title }]) => {
+    app.get("/" + route, (req, res) => {
+        const viewExists = fs.existsSync(path.join(__dirname, "views", view + ".ejs"));
+
+        if (viewExists) {
+            res.render(view, { active: route });
+        }
+    });
+});
+
+// logout has no session to destroy yet, so just go back to login
+app.post("/logout", (req, res) => {
+    res.redirect("/login.html");
 });
 
 app.listen(port, hostname, () => {
