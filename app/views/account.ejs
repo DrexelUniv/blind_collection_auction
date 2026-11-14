@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8" />
   <title>My Account</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="account.css" />
+  <link rel="stylesheet" href="/style/style.css" />
+  <link rel="stylesheet" href="/style/account.css" />
 </head>
 <body>
     
     <!-- Universal Navigation Bar-->
+    <%- include("navbar", { active }) %>
 
     <header>
         <div>
@@ -52,7 +53,7 @@
         </div>
     </main>
     <script
-        src="account.js">
+        src="../public/js/account.js">
     </script>
 </body>
 </html>
